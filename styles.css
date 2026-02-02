@@ -2,6 +2,10 @@
    AKIRA-INSPIRED GLOBAL RESET
    ================================ */
 
+  html {
+  background: #111 !important;
+}
+
 *,
 *::before,
 *::after {
