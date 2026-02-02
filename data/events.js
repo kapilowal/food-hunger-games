@@ -1,7 +1,28 @@
-const EVENTS = [
-  "{loser} choked on {food}.",
-  "{loser} was poisoned by {food}.",
-  "{loser} couldn't handle the spice of {food}.",
-  "{loser} slipped while fighting over {food}.",
-  "{loser} trusted the wrong chef."
-];
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function generateEvent(playerName, foodText) {
+  const LOCATIONS = [
+    "in a narrow alley",
+    "near a street stall",
+    "inside a crowded market",
+    "under flickering lights",
+    "by a broken vending machine"
+  ];
+
+  const INCIDENTS = [
+    "things escalated quickly",
+    "attention shifted suddenly",
+    "the situation turned tense",
+    "someone intervened",
+    "control was lost"
+  ];
+
+  return `
+${playerName} was searching for food ${pick(LOCATIONS)}.
+
+They found ${foodText}.
+${pick(INCIDENTS)}.
+`.trim();
+}
