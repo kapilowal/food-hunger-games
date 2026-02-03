@@ -16,12 +16,54 @@ const resetGameBtn = document.getElementById("resetGameBtn");
 const playerList = document.getElementById("playerList");
 const gameLog = document.getElementById("gameLog");
 
-/* UTIL */
+/* ---------------- UTIL ---------------- */
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/* TYPEWRITER */
+/* -------- ADD PLAYER (REUSABLE) -------- */
+function tryAddPlayerFromInput() {
+  if (gameRunning) return false;
+
+  const name = playerInput.value.trim();
+  if (!name) return false;
+
+  if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+    playerInput.value = "";
+    return false;
+  }
+
+  players.push({
+    name,
+    status: "alive",
+    joinedRound: 1,
+    eliminatedRound: null,
+    foodHistory: []
+  });
+
+  playerInput.value = "";
+  renderPlayers();
+  return true;
+}
+
+/* -------- ENTER TO ADD PLAYER -------- */
+playerInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    tryAddPlayerFromInput();
+  }
+});
+
+/* -------- RENDER PLAYER LIST -------- */
+function renderPlayers() {
+  playerList.innerHTML = "";
+  players.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p.name;
+    playerList.appendChild(li);
+  });
+}
+
+/* ---------------- TYPEWRITER ---------------- */
 function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
   clearTimeout(typingTimeout);
   gameLog.innerHTML = "";
@@ -39,43 +81,12 @@ function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
   type();
 }
 
-/* ENTER TO ADD PLAYER */
-playerInput.addEventListener("keydown", (e) => {
-  if (e.key !== "Enter" || gameRunning) return;
-
-  const name = playerInput.value.trim();
-  if (!name) return;
-
-  if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
-    playerInput.value = "";
-    return;
-  }
-
-  players.push({
-    name,
-    status: "alive",
-    joinedRound: 1,
-    eliminatedRound: null,
-    foodHistory: []
-  });
-
-  playerInput.value = "";
-  renderPlayers();
-});
-
-/* RENDER PLAYER LIST */
-function renderPlayers() {
-  playerList.innerHTML = "";
-  players.forEach(p => {
-    const li = document.createElement("li");
-    li.textContent = p.name;
-    playerList.appendChild(li);
-  });
-}
-
-/* START GAME */
+/* ---------------- START BUTTON ---------------- */
 startGameBtn.onclick = () => {
   if (gameRunning) return;
+
+  // 🔑 CRITICAL FIX: add pending name before start
+  tryAddPlayerFromInput();
 
   if (players.length < 2) {
     renderTransmission(
@@ -90,10 +101,10 @@ TYPE_SPEED
   startGame();
 };
 
-/* RESET */
+/* ---------------- RESET ---------------- */
 resetGameBtn.onclick = resetGame;
 
-/* GAME START */
+/* ---------------- GAME START ---------------- */
 function startGame() {
   gameRunning = true;
   round = 1;
@@ -112,7 +123,7 @@ TYPE_SPEED,
   );
 }
 
-/* CORE LOOP */
+/* ---------------- CORE LOOP ---------------- */
 function runRound() {
   if (alivePlayers.length === 0 && downPlayers.length > 0) {
     const revived = downPlayers.shift();
@@ -181,7 +192,7 @@ TYPE_SPEED,
   });
 }
 
-/* FINAL GRID */
+/* ---------------- FINAL GRID ---------------- */
 function showFinalGrid() {
   const totalRounds = round - 1;
   const winner = alivePlayers[0];
@@ -213,7 +224,7 @@ function showFinalGrid() {
   gameRunning = false;
 }
 
-/* RESET GAME */
+/* ---------------- RESET GAME ---------------- */
 function resetGame() {
   players = [];
   alivePlayers = [];
