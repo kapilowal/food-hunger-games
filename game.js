@@ -21,10 +21,27 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/* ENTER KEY ADD */
+/* TYPEWRITER */
+function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
+  clearTimeout(typingTimeout);
+  gameLog.innerHTML = "";
+  let i = 0;
+
+  function type() {
+    if (i < text.length) {
+      gameLog.innerHTML += text[i] === "\n" ? "<br>" : text[i];
+      i++;
+      typingTimeout = setTimeout(type, speed);
+    } else {
+      onComplete();
+    }
+  }
+  type();
+}
+
+/* ENTER TO ADD PLAYER */
 playerInput.addEventListener("keydown", (e) => {
-  if (e.key !== "Enter") return;
-  if (gameRunning) return;
+  if (e.key !== "Enter" || gameRunning) return;
 
   const name = playerInput.value.trim();
   if (!name) return;
@@ -46,7 +63,7 @@ playerInput.addEventListener("keydown", (e) => {
   renderPlayers();
 });
 
-/* UI */
+/* RENDER PLAYER LIST */
 function renderPlayers() {
   playerList.innerHTML = "";
   players.forEach(p => {
@@ -56,31 +73,28 @@ function renderPlayers() {
   });
 }
 
-startGameBtn.onclick = startGame;
-resetGameBtn.onclick = resetGame;
+/* START GAME */
+startGameBtn.onclick = () => {
+  if (gameRunning) return;
 
-/* TYPEWRITER */
-function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
-  clearTimeout(typingTimeout);
-  gameLog.innerHTML = "";
-  let i = 0;
+  if (players.length < 2) {
+    renderTransmission(
+`UNABLE TO START
 
-  function type() {
-    if (i < text.length) {
-      gameLog.innerHTML += text[i] === "\n" ? "<br>" : text[i];
-      i++;
-      typingTimeout = setTimeout(type, speed);
-    } else {
-      onComplete();
-    }
+At least 2 players required.`,
+TYPE_SPEED
+    );
+    return;
   }
-  type();
-}
+
+  startGame();
+};
+
+/* RESET */
+resetGameBtn.onclick = resetGame;
 
 /* GAME START */
 function startGame() {
-  if (players.length < 2) return;
-
   gameRunning = true;
   round = 1;
   alivePlayers = players.map(p => ({ ...p, foodHistory: [] }));
@@ -91,13 +105,14 @@ function startGame() {
 `GLOBAL STREET BROADCAST
 Multiple feeds detected.
 Information unreliable.
+
 TRANSMISSION ACTIVE.`,
 TYPE_SPEED,
 () => setTimeout(runRound, 2000)
   );
 }
 
-/* CORE GAME LOOP */
+/* CORE LOOP */
 function runRound() {
   if (alivePlayers.length === 0 && downPlayers.length > 0) {
     const revived = downPlayers.shift();
@@ -130,10 +145,8 @@ TYPE_SPEED,
   actor.foodHistory.push(foodText);
   text += `\n${generateEvent(actor.name, foodText)}\n`;
 
-  const aliveCount = alivePlayers.length;
   let outcome;
-
-  if (aliveCount <= 2) {
+  if (alivePlayers.length <= 2) {
     outcome = "ELIMINATION";
   } else {
     const roll = Math.random();
@@ -149,17 +162,13 @@ TYPE_SPEED,
 
   if (outcome === "SAFE") {
     text += `\nNothing serious happened.`;
-  }
-
-  if (outcome === "DOWN") {
+  } else if (outcome === "DOWN") {
     const affected = pickAffected();
     affected.status = "down";
     downPlayers.push(affected);
     alivePlayers = alivePlayers.filter(p => p !== affected);
     text += `\n${affected.name} went down.`;
-  }
-
-  if (outcome === "ELIMINATION") {
+  } else {
     const affected = pickAffected();
     affected.status = "dead";
     affected.eliminatedRound = round - 1;
@@ -192,9 +201,9 @@ function showFinalGrid() {
 
     html += `
       <div class="player-card ${p === winner ? "winner" : ""}">
-        <div><strong>${p === winner ? "🎉✨🥳 " : ""}${p.name}</strong></div>
-        <div>Rounds: ${survived}</div>
-        <div>Food: ${foods || "None"}</div>
+        <strong>${p === winner ? "🎉✨🥳 " : ""}${p.name}</strong><br>
+        Rounds: ${survived}<br>
+        Food: ${foods || "None"}
       </div>
     `;
   });
@@ -204,7 +213,7 @@ function showFinalGrid() {
   gameRunning = false;
 }
 
-/* RESET */
+/* RESET GAME */
 function resetGame() {
   players = [];
   alivePlayers = [];
