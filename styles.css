@@ -22,16 +22,16 @@ body {
 .app {
   width: 100%;
   max-width: 900px;
-  padding: 20px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 /* HEADER */
 h1 {
   margin: 0;
-  padding: 14px;
+  padding: 12px;
   background: #d00000;
   color: #fff;
   text-align: center;
@@ -43,21 +43,21 @@ h1 {
 /* CONTROLS */
 .controls {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 input {
   flex: 1;
   min-width: 160px;
-  padding: 10px;
+  padding: 8px 10px;
   background: #000;
   border: 2px solid #444;
   color: #fff;
 }
 
 button {
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: #111;
   border: 2px solid #d00000;
   color: #fff;
@@ -73,36 +73,36 @@ button:hover {
 #playerList {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px;
+  gap: 6px;
+  padding: 8px;
   background: #050505;
   border: 2px solid #333;
 }
 
 #playerList li {
   list-style: none;
-  padding: 6px 10px;
+  padding: 5px 8px;
   background: #111;
   border: 1px solid #444;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
 }
 
-/* GAME LOG — FIXED SIZE */
+/* GAME LOG — FIXED SIZE, DENSE */
 #gameLog {
-  height: 260px;            /* 🔒 fixed height */
-  max-height: 260px;
-  overflow-y: auto;         /* ✅ scroll inside */
+  height: 240px;          /* 🔒 fixed */
+  max-height: 240px;
+  overflow-y: auto;       /* scroll inside only */
   overflow-x: hidden;
 
-  padding: 16px;
+  padding: 12px;
   background: #000;
   border: 3px solid #d00000;
 
   font-size: 0.85rem;
-  line-height: 1.6;
+  line-height: 1.35;      /* 🔽 tighter spacing */
 }
 
-/* CRT SCANLINES */
+/* SUBTLE CRT SCANLINES */
 #gameLog::after {
   content: "";
   position: absolute;
@@ -110,8 +110,8 @@ button:hover {
   pointer-events: none;
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255,255,255,0.03),
-    rgba(255,255,255,0.03) 1px,
+    rgba(255,255,255,0.025),
+    rgba(255,255,255,0.025) 1px,
     transparent 1px,
     transparent 3px
   );
@@ -120,7 +120,7 @@ button:hover {
 /* ACTIONS */
 .actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .actions button {

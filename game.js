@@ -6,7 +6,6 @@ let round = 1;
 let gameRunning = false;
 
 let typingTimeout = null;
-let cursorInterval = null;
 
 const TYPE_SPEED = 40;
 const POST_ROUND_PAUSE = 4000;
@@ -23,7 +22,7 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/* TYPEWRITER */
+/* TYPEWRITER — FIXED NEWLINES */
 function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
   clearTimeout(typingTimeout);
   gameLog.innerHTML = "";
@@ -31,7 +30,7 @@ function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
 
   function type() {
     if (i < text.length) {
-      gameLog.innerHTML += text[i] === "\n" ? "<br><br>" : text[i];
+      gameLog.innerHTML += text[i] === "\n" ? "<br>" : text[i];
       i++;
       typingTimeout = setTimeout(type, speed);
     } else {
@@ -80,10 +79,8 @@ function startGame() {
 
   renderTransmission(
 `GLOBAL STREET BROADCAST
-
 Multiple feeds detected.
 Information unreliable.
-
 TRANSMISSION ACTIVE.`,
 TYPE_SPEED,
 () => setTimeout(runRound, 2000)
@@ -107,7 +104,7 @@ function runRound() {
   const food = pick(availableFoods);
   const foodText = `${food.emoji} ${food.name} (${food.country})`;
 
-  text += "\n" + generateEvent(actor.name, foodText) + "\n";
+  text += `\n${generateEvent(actor.name, foodText)}\n`;
 
   const roll = Math.random();
 
@@ -119,15 +116,15 @@ function runRound() {
   }
 
   if (roll < 0.35) {
-    text += "\nNothing serious happened. People dispersed and moved on.";
-  } 
+    text += `\nNothing serious happened. People dispersed and moved on.`;
+  }
   else if (roll < 0.65 && alivePlayers.length > 2) {
     const affected = pickAffected();
     affected.status = "down";
     downPlayers.push(affected);
     alivePlayers = alivePlayers.filter(p => p !== affected);
     text += `\n${affected.name} went down. No clear confirmation followed.`;
-  } 
+  }
   else {
     const affected = pickAffected();
     affected.status = "dead";
@@ -147,7 +144,7 @@ Down: ${downPlayers.map(p => p.name).join(", ") || "None"}`;
 /* FINAL STATS */
 function showFinalStats() {
   const totalRounds = round - 1;
-  let text = `FINAL TRANSMISSION\n\nTotal Rounds: ${totalRounds}\n`;
+  let text = `FINAL TRANSMISSION\n\nTotal Rounds: ${totalRounds}`;
 
   players.forEach(p => {
     const survived =
