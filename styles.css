@@ -22,7 +22,7 @@ body {
 .app {
   width: 100%;
   max-width: 900px;
-  padding: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -87,34 +87,40 @@ button:hover {
   font-size: 0.7rem;
 }
 
-/* GAME LOG — FIXED SIZE, DENSE */
+/* GAME LOG — FIXED, NO SCROLL */
 #gameLog {
-  height: 240px;          /* 🔒 fixed */
-  max-height: 240px;
-  overflow-y: auto;       /* scroll inside only */
-  overflow-x: hidden;
-
+  height: 240px;
   padding: 12px;
   background: #000;
   border: 3px solid #d00000;
-
   font-size: 0.85rem;
-  line-height: 1.35;      /* 🔽 tighter spacing */
+  line-height: 1.35;
+  overflow: hidden; /* 🚫 no scrolling */
 }
 
-/* SUBTLE CRT SCANLINES */
-#gameLog::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.025),
-    rgba(255,255,255,0.025) 1px,
-    transparent 1px,
-    transparent 3px
-  );
+/* FINAL SUMMARY GRID */
+.final-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.player-card {
+  border: 1px solid #444;
+  padding: 8px;
+  background: #0a0a0a;
+  font-size: 0.7rem;
+  line-height: 1.3;
+}
+
+.player-card .name {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.player-card.winner {
+  border-color: #ffd700;
+  background: #1a1a00;
 }
 
 /* ACTIONS */

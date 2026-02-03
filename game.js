@@ -91,35 +91,28 @@ TYPE_SPEED,
 }
 
 function runRound() {
-  /* 🛑 SAFETY NET: no alive players */
   if (alivePlayers.length === 0 && downPlayers.length > 0) {
     const revived = downPlayers.shift();
     revived.status = "alive";
     alivePlayers.push(revived);
-
     renderTransmission(
-`SIGNAL FLUCTUATION
-
-${revived.name} was never confirmed dead.
-They reappear.`,
+`${revived.name} was never confirmed dead.
+Signal stabilizes.`,
 TYPE_SPEED,
 () => setTimeout(runRound, 2000)
     );
     return;
   }
 
-  /* 🏁 FINAL CONDITION */
   if (alivePlayers.length === 1 && downPlayers.length === 0) {
-    showFinalStats();
+    showFinalGrid();
     return;
   }
 
   let text = `ROUND ${round}\n`;
   round++;
 
-  if (availableFoods.length === 0) {
-    availableFoods = [...FOODS];
-  }
+  if (availableFoods.length === 0) availableFoods = [...FOODS];
 
   const actor = pick(alivePlayers);
   const food = pick(availableFoods);
@@ -139,35 +132,33 @@ TYPE_SPEED,
   }
 
   if (roll < 0.35) {
-    text += `\nNothing serious happened. People dispersed and moved on.`;
-  }
-  else if (roll < 0.65 && alivePlayers.length > 1) {
+    text += `\nNothing serious happened.`;
+  } else if (roll < 0.65 && alivePlayers.length > 1) {
     const affected = pickAffected();
     affected.status = "down";
     downPlayers.push(affected);
     alivePlayers = alivePlayers.filter(p => p !== affected);
-    text += `\n${affected.name} went down. No clear confirmation followed.`;
-  }
-  else {
+    text += `\n${affected.name} went down.`;
+  } else {
     const affected = pickAffected();
     affected.status = "dead";
     affected.eliminatedRound = round - 1;
     alivePlayers = alivePlayers.filter(p => p !== affected);
-    text += `\n${affected.name} was eliminated. The feed cut shortly after.`;
+    text += `\n${affected.name} was eliminated.`;
   }
-
-  text += `\n\nAlive: ${alivePlayers.map(p => p.name).join(", ") || "None"}
-Down: ${downPlayers.map(p => p.name).join(", ") || "None"}`;
 
   renderTransmission(text, TYPE_SPEED, () => {
     setTimeout(runRound, POST_ROUND_PAUSE);
   });
 }
 
-/* FINAL STATS */
-function showFinalStats() {
+/* FINAL GRID */
+function showFinalGrid() {
   const totalRounds = round - 1;
-  let text = `FINAL TRANSMISSION\n\nTotal Rounds: ${totalRounds}\n`;
+  const winner = alivePlayers[0];
+
+  let html = `<div><strong>FINAL TRANSMISSION</strong><br>Total Rounds: ${totalRounds}</div><br>`;
+  html += `<div class="final-grid">`;
 
   players.forEach(p => {
     const survived =
@@ -175,18 +166,23 @@ function showFinalStats() {
         ? p.eliminatedRound - p.joinedRound + 1
         : totalRounds;
 
-    text += `\n${p.name} survived ${survived} rounds.`;
+    const foods =
+      p.foodHistory.length > 4
+        ? `${p.foodHistory.slice(0, 2).join(" → ")} → … → ${p.foodHistory.slice(-2).join(" → ")}`
+        : p.foodHistory.join(" → ");
 
-    if (p.foodHistory.length > 0) {
-      text += `\nFood journey: ${p.foodHistory.join(" → ")}`;
-    }
-    text += "\n";
+    html += `
+      <div class="player-card ${p === winner ? "winner" : ""}">
+        <div class="name">${p === winner ? "🎉✨🥳 " : ""}${p.name}</div>
+        <div>Rounds: ${survived}</div>
+        <div>Food: ${foods || "None"}</div>
+      </div>
+    `;
   });
 
-  const winner = alivePlayers[0];
-  text += `\n🎉✨🥳 WINNER: ${winner.name} 🥳✨🎉`;
+  html += `</div>`;
 
-  renderTransmission(text, TYPE_SPEED);
+  gameLog.innerHTML = html;
   gameRunning = false;
 }
 
@@ -198,7 +194,6 @@ function resetGame() {
   availableFoods = [];
   round = 1;
   gameRunning = false;
-
   clearTimeout(typingTimeout);
   playerList.innerHTML = "";
   gameLog.innerHTML = "";
