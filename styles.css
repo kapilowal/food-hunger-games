@@ -1,32 +1,18 @@
-/* ================================
-   AKIRA-INSPIRED GLOBAL RESET
-   ================================ */
-
-  html {
-  background: #111 !important;
-}
-
-*,
-*::before,
-*::after {
+/* GLOBAL RESET */
+* {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
-  width: 100%;
   min-height: 100vh;
   background: #0a0a0a;
   color: #eaeaea;
   font-family: "Courier New", Courier, monospace;
 }
 
-/* ================================
-   CENTERED LAYOUT
-   ================================ */
-
+/* CENTER APP */
 body {
   display: flex;
   align-items: center;
@@ -39,66 +25,43 @@ body {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* ================================
-   HEADER / TITLE
-   ================================ */
-
+/* HEADER */
 h1 {
   margin: 0;
-  padding: 14px 18px;
-  text-align: center;
-  font-size: 1.4rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-
+  padding: 14px;
   background: #d00000;
   color: #fff;
-
+  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   border: 2px solid #ff3b3b;
 }
 
-/* ================================
-   PLAYER INPUT SECTION
-   ================================ */
-
+/* CONTROLS */
 .controls {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-input[type="text"] {
+input {
   flex: 1;
   min-width: 160px;
-
-  background: #0a0a0a;
-  color: #fff;
-
+  padding: 10px;
+  background: #000;
   border: 2px solid #444;
-  padding: 10px 12px;
-
-  font-size: 0.9rem;
-  outline: none;
-}
-
-input[type="text"]::placeholder {
-  color: #777;
+  color: #fff;
 }
 
 button {
-  background: #111;
-  color: #fff;
-
-  border: 2px solid #d00000;
   padding: 10px 14px;
-
-  font-size: 0.8rem;
-  letter-spacing: 1px;
+  background: #111;
+  border: 2px solid #d00000;
+  color: #fff;
   text-transform: uppercase;
-
   cursor: pointer;
 }
 
@@ -106,127 +69,67 @@ button:hover {
   background: #d00000;
 }
 
-button:active {
-  transform: translateY(1px);
-}
-
-/* ================================
-   PLAYER LIST
-   ================================ */
-
+/* PLAYER LIST */
 #playerList {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-
   padding: 10px;
-  border: 2px solid #333;
   background: #050505;
+  border: 2px solid #333;
 }
 
 #playerList li {
   list-style: none;
   padding: 6px 10px;
-
   background: #111;
   border: 1px solid #444;
-
   font-size: 0.75rem;
-  letter-spacing: 0.5px;
 }
 
-/* ================================
-   GAME LOG / TERMINAL
-   ================================ */
-
+/* GAME LOG — FIXED SIZE */
 #gameLog {
-  min-height: 260px;
+  height: 260px;            /* 🔒 fixed height */
+  max-height: 260px;
+  overflow-y: auto;         /* ✅ scroll inside */
+  overflow-x: hidden;
+
   padding: 16px;
-
   background: #000;
-  color: #eaeaea;
-
   border: 3px solid #d00000;
 
   font-size: 0.85rem;
-  line-height: 1.5;
-  letter-spacing: 0.6px;
-
-  overflow: hidden;
-  position: relative;
+  line-height: 1.6;
 }
 
-/* subtle CRT scanline effect */
+/* CRT SCANLINES */
 #gameLog::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.03),
-    rgba(255, 255, 255, 0.03) 1px,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
     transparent 1px,
     transparent 3px
   );
 }
 
-/* ================================
-   FOOTER BUTTONS
-   ================================ */
-
+/* ACTIONS */
 .actions {
   display: flex;
   gap: 10px;
-  justify-content: space-between;
 }
 
 .actions button {
   flex: 1;
 }
 
-/* ================================
-   RESPONSIVE DESIGN
-   ================================ */
-
-/* Tablet */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 1.2rem;
-  }
-
-  #gameLog {
-    min-height: 220px;
-    font-size: 0.8rem;
-  }
-}
-
-/* Mobile */
+/* MOBILE */
 @media (max-width: 480px) {
-  .app {
-    padding: 12px;
-  }
-
-  h1 {
-    font-size: 1rem;
-    padding: 10px;
-  }
-
-  input[type="text"],
-  button {
-    font-size: 0.75rem;
-    padding: 8px 10px;
-  }
-
   #gameLog {
-    min-height: 200px;
-    padding: 12px;
-    font-size: 0.75rem;
-  }
-
-  .controls,
-  .actions {
-    flex-direction: column;
+    height: 200px;
   }
 }

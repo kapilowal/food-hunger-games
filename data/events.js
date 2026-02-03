@@ -2,27 +2,32 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function generateEvent(playerName, foodText) {
-  const LOCATIONS = [
-    "in a narrow alley",
-    "near a street stall",
-    "inside a crowded market",
-    "under flickering lights",
-    "by a broken vending machine"
-  ];
+const LOCATIONS = [
+  "near a crowded street food stall",
+  "outside a closed shop with people waiting",
+  "by a metro entrance during rush hour",
+  "under a flyover where traffic backed up",
+  "at the edge of a night market"
+];
 
-  const INCIDENTS = [
-    "things escalated quickly",
-    "attention shifted suddenly",
-    "the situation turned tense",
-    "someone intervened",
-    "control was lost"
-  ];
+const TRIGGERS = [
+  "someone misheard a comment",
+  "a phone was raised to record",
+  "a joke landed the wrong way",
+  "someone stepped in to help",
+  "an argument drew attention"
+];
 
-  return `
-${playerName} was searching for food ${pick(LOCATIONS)}.
+const ESCALATIONS = [
+  "people stopped to watch",
+  "voices got louder",
+  "nobody backed down",
+  "tension spread through the crowd",
+  "control slipped away"
+];
 
-They found ${foodText}.
-${pick(INCIDENTS)}.
-`.trim();
+function generateEvent(actorName, foodText) {
+  return `${actorName} was looking for food ${pick(LOCATIONS)}. 
+They came across ${foodText}. 
+${pick(TRIGGERS)} and ${pick(ESCALATIONS)}.`;
 }
