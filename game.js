@@ -22,7 +22,7 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-/* TYPEWRITER — FIXED NEWLINES */
+/* TYPEWRITER */
 function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
   clearTimeout(typingTimeout);
   gameLog.innerHTML = "";
@@ -45,12 +45,15 @@ addPlayerBtn.onclick = () => {
   if (gameRunning) return;
   const name = playerInput.value.trim();
   if (!name) return;
+
   players.push({
     name,
     status: "alive",
     joinedRound: 1,
-    eliminatedRound: null
+    eliminatedRound: null,
+    foodHistory: []   // 🆕 track foods per round
   });
+
   playerInput.value = "";
   renderPlayers();
 };
@@ -73,7 +76,7 @@ function startGame() {
 
   gameRunning = true;
   round = 1;
-  alivePlayers = players.map(p => ({ ...p }));
+  alivePlayers = players.map(p => ({ ...p, foodHistory: [] }));
   downPlayers = [];
   availableFoods = [...FOODS];
 
@@ -103,6 +106,9 @@ function runRound() {
   const actor = pick(alivePlayers);
   const food = pick(availableFoods);
   const foodText = `${food.emoji} ${food.name} (${food.country})`;
+
+  // 🆕 Record food for the actor
+  actor.foodHistory.push(foodText);
 
   text += `\n${generateEvent(actor.name, foodText)}\n`;
 
@@ -144,18 +150,24 @@ Down: ${downPlayers.map(p => p.name).join(", ") || "None"}`;
 /* FINAL STATS */
 function showFinalStats() {
   const totalRounds = round - 1;
-  let text = `FINAL TRANSMISSION\n\nTotal Rounds: ${totalRounds}`;
+  let text = `FINAL TRANSMISSION\n\nTotal Rounds: ${totalRounds}\n`;
 
   players.forEach(p => {
     const survived =
       p.eliminatedRound
         ? p.eliminatedRound - p.joinedRound + 1
         : totalRounds;
+
     text += `\n${p.name} survived ${survived} rounds.`;
+
+    if (p.foodHistory.length > 0) {
+      text += `\nFood journey: ${p.foodHistory.join(" → ")}`;
+    }
+    text += "\n";
   });
 
   const winner = alivePlayers[0];
-  text += `\n\nWINNER: ${winner.name}`;
+  text += `\n🎉✨🥳 WINNER: ${winner.name} 🥳✨🎉`;
 
   renderTransmission(text, TYPE_SPEED);
   gameRunning = false;

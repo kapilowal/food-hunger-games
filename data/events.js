@@ -7,15 +7,19 @@ const LOCATIONS = [
   "outside a closed shop with people waiting",
   "by a metro entrance during rush hour",
   "under a flyover where traffic backed up",
-  "at the edge of a night market"
+  "at the edge of a night market",
+  "near a food truck drawing a long line",
+  "outside a building with security watching"
 ];
 
 const TRIGGERS = [
   "someone misheard a comment",
   "a phone was raised to record",
   "a joke landed the wrong way",
-  "someone stepped in to help",
-  "an argument drew attention"
+  "someone tried to intervene",
+  "an argument drew attention",
+  "a small mistake was pointed out",
+  "silence made things awkward"
 ];
 
 const ESCALATIONS = [
@@ -23,11 +27,13 @@ const ESCALATIONS = [
   "voices got louder",
   "nobody backed down",
   "tension spread through the crowd",
-  "control slipped away"
+  "control slipped away",
+  "the mood shifted suddenly",
+  "everything escalated faster than expected"
 ];
 
 function generateEvent(actorName, foodText) {
-  return `${actorName} was looking for food ${pick(LOCATIONS)}. 
-They came across ${foodText}. 
-${pick(TRIGGERS)} and ${pick(ESCALATIONS)}.`;
+  return `${actorName} was looking for food ${pick(LOCATIONS)}.
+They came across ${foodText}.
+${pick(TRIGGERS)}, and ${pick(ESCALATIONS)}.`;
 }
