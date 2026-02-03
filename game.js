@@ -51,7 +51,7 @@ addPlayerBtn.onclick = () => {
     status: "alive",
     joinedRound: 1,
     eliminatedRound: null,
-    foodHistory: []   // 🆕 track foods per round
+    foodHistory: []
   });
 
   playerInput.value = "";
@@ -91,6 +91,24 @@ TYPE_SPEED,
 }
 
 function runRound() {
+  /* 🛑 SAFETY NET: no alive players */
+  if (alivePlayers.length === 0 && downPlayers.length > 0) {
+    const revived = downPlayers.shift();
+    revived.status = "alive";
+    alivePlayers.push(revived);
+
+    renderTransmission(
+`SIGNAL FLUCTUATION
+
+${revived.name} was never confirmed dead.
+They reappear.`,
+TYPE_SPEED,
+() => setTimeout(runRound, 2000)
+    );
+    return;
+  }
+
+  /* 🏁 FINAL CONDITION */
   if (alivePlayers.length === 1 && downPlayers.length === 0) {
     showFinalStats();
     return;
@@ -105,9 +123,8 @@ function runRound() {
 
   const actor = pick(alivePlayers);
   const food = pick(availableFoods);
-  const foodText = `${food.emoji} ${food.name} (${food.country})`;
+  const foodText = `${food.emoji} ${food.name}`;
 
-  // 🆕 Record food for the actor
   actor.foodHistory.push(foodText);
 
   text += `\n${generateEvent(actor.name, foodText)}\n`;
@@ -124,7 +141,7 @@ function runRound() {
   if (roll < 0.35) {
     text += `\nNothing serious happened. People dispersed and moved on.`;
   }
-  else if (roll < 0.65 && alivePlayers.length > 2) {
+  else if (roll < 0.65 && alivePlayers.length > 1) {
     const affected = pickAffected();
     affected.status = "down";
     downPlayers.push(affected);
