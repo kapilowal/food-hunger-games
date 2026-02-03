@@ -11,7 +11,6 @@ const TYPE_SPEED = 40;
 const POST_ROUND_PAUSE = 4000;
 
 const playerInput = document.getElementById("playerName");
-const addPlayerBtn = document.getElementById("addPlayerBtn");
 const startGameBtn = document.getElementById("startGameBtn");
 const resetGameBtn = document.getElementById("resetGameBtn");
 const playerList = document.getElementById("playerList");
@@ -21,6 +20,44 @@ const gameLog = document.getElementById("gameLog");
 function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
+
+/* ENTER KEY ADD */
+playerInput.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  if (gameRunning) return;
+
+  const name = playerInput.value.trim();
+  if (!name) return;
+
+  if (players.some(p => p.name.toLowerCase() === name.toLowerCase())) {
+    playerInput.value = "";
+    return;
+  }
+
+  players.push({
+    name,
+    status: "alive",
+    joinedRound: 1,
+    eliminatedRound: null,
+    foodHistory: []
+  });
+
+  playerInput.value = "";
+  renderPlayers();
+});
+
+/* UI */
+function renderPlayers() {
+  playerList.innerHTML = "";
+  players.forEach(p => {
+    const li = document.createElement("li");
+    li.textContent = p.name;
+    playerList.appendChild(li);
+  });
+}
+
+startGameBtn.onclick = startGame;
+resetGameBtn.onclick = resetGame;
 
 /* TYPEWRITER */
 function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
@@ -40,37 +77,7 @@ function renderTransmission(text, speed = TYPE_SPEED, onComplete = () => {}) {
   type();
 }
 
-/* UI */
-addPlayerBtn.onclick = () => {
-  if (gameRunning) return;
-  const name = playerInput.value.trim();
-  if (!name) return;
-
-  players.push({
-    name,
-    status: "alive",
-    joinedRound: 1,
-    eliminatedRound: null,
-    foodHistory: []
-  });
-
-  playerInput.value = "";
-  renderPlayers();
-};
-
-function renderPlayers() {
-  playerList.innerHTML = "";
-  players.forEach(p => {
-    const li = document.createElement("li");
-    li.textContent = p.name;
-    playerList.appendChild(li);
-  });
-}
-
-startGameBtn.onclick = startGame;
-resetGameBtn.onclick = resetGame;
-
-/* GAME */
+/* GAME START */
 function startGame() {
   if (players.length < 2) return;
 
@@ -90,11 +97,13 @@ TYPE_SPEED,
   );
 }
 
+/* CORE GAME LOOP */
 function runRound() {
   if (alivePlayers.length === 0 && downPlayers.length > 0) {
     const revived = downPlayers.shift();
     revived.status = "alive";
     alivePlayers.push(revived);
+
     renderTransmission(
 `${revived.name} was never confirmed dead.
 Signal stabilizes.`,
@@ -119,27 +128,38 @@ TYPE_SPEED,
   const foodText = `${food.emoji} ${food.name}`;
 
   actor.foodHistory.push(foodText);
-
   text += `\n${generateEvent(actor.name, foodText)}\n`;
 
-  const roll = Math.random();
+  const aliveCount = alivePlayers.length;
+  let outcome;
+
+  if (aliveCount <= 2) {
+    outcome = "ELIMINATION";
+  } else {
+    const roll = Math.random();
+    if (roll < 0.3) outcome = "SAFE";
+    else if (roll < 0.6) outcome = "DOWN";
+    else outcome = "ELIMINATION";
+  }
 
   function pickAffected() {
     if (alivePlayers.length === 1) return actor;
-    return Math.random() < 0.6
-      ? actor
-      : pick(alivePlayers.filter(p => p !== actor));
+    return pick(alivePlayers.filter(p => p !== actor));
   }
 
-  if (roll < 0.35) {
+  if (outcome === "SAFE") {
     text += `\nNothing serious happened.`;
-  } else if (roll < 0.65 && alivePlayers.length > 1) {
+  }
+
+  if (outcome === "DOWN") {
     const affected = pickAffected();
     affected.status = "down";
     downPlayers.push(affected);
     alivePlayers = alivePlayers.filter(p => p !== affected);
     text += `\n${affected.name} went down.`;
-  } else {
+  }
+
+  if (outcome === "ELIMINATION") {
     const affected = pickAffected();
     affected.status = "dead";
     affected.eliminatedRound = round - 1;
@@ -157,14 +177,13 @@ function showFinalGrid() {
   const totalRounds = round - 1;
   const winner = alivePlayers[0];
 
-  let html = `<div><strong>FINAL TRANSMISSION</strong><br>Total Rounds: ${totalRounds}</div><br>`;
+  let html = `<strong>FINAL TRANSMISSION</strong><br>Total Rounds: ${totalRounds}<br><br>`;
   html += `<div class="final-grid">`;
 
   players.forEach(p => {
-    const survived =
-      p.eliminatedRound
-        ? p.eliminatedRound - p.joinedRound + 1
-        : totalRounds;
+    const survived = p.eliminatedRound
+      ? p.eliminatedRound - p.joinedRound + 1
+      : totalRounds;
 
     const foods =
       p.foodHistory.length > 4
@@ -173,7 +192,7 @@ function showFinalGrid() {
 
     html += `
       <div class="player-card ${p === winner ? "winner" : ""}">
-        <div class="name">${p === winner ? "🎉✨🥳 " : ""}${p.name}</div>
+        <div><strong>${p === winner ? "🎉✨🥳 " : ""}${p.name}</strong></div>
         <div>Rounds: ${survived}</div>
         <div>Food: ${foods || "None"}</div>
       </div>
@@ -181,7 +200,6 @@ function showFinalGrid() {
   });
 
   html += `</div>`;
-
   gameLog.innerHTML = html;
   gameRunning = false;
 }
@@ -194,6 +212,7 @@ function resetGame() {
   availableFoods = [];
   round = 1;
   gameRunning = false;
+
   clearTimeout(typingTimeout);
   playerList.innerHTML = "";
   gameLog.innerHTML = "";

@@ -2,47 +2,35 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Food Hunger Games</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Global Street Broadcast</title>
-
-  <!-- CSS -->
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-
   <div class="app">
-    <!-- HEADER -->
-    <h1>Global Street Broadcast</h1>
+    <h1>Food Hunger Games</h1>
 
-    <!-- PLAYER CONTROLS -->
     <div class="controls">
       <input
-        type="text"
         id="playerName"
-        placeholder="ENTER NAME"
+        type="text"
+        placeholder="Type name and press Enter"
         autocomplete="off"
       />
-      <button id="addPlayerBtn">Add</button>
-      <button id="startGameBtn">Start</button>
     </div>
 
-    <!-- PLAYER LIST -->
     <ul id="playerList"></ul>
 
-    <!-- GAME LOG / TERMINAL -->
     <div id="gameLog"></div>
 
-    <!-- ACTION BUTTONS -->
     <div class="actions">
-      <button id="resetGameBtn">Reset Game</button>
+      <button id="startGameBtn">Start</button>
+      <button id="resetGameBtn">Reset</button>
     </div>
   </div>
 
-  <!-- SCRIPTS (ORDER MATTERS) -->
-  <script src="data/foods.js"></script>
-  <script src="data/countryLogic.js"></script>
+  <script src="foods.js"></script>
   <script src="data/events.js"></script>
   <script src="game.js"></script>
-
 </body>
 </html>
